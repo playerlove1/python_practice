@@ -16,7 +16,7 @@ time_wait_second=2*60*60
 #程式啟動的顯示字串
 print("This is program started on "+time.ctime())
 
-while(break_count<total_breaks)
+while(break_count<total_breaks):
     #等待時間
     time.sleep(time_wait_second)
     #開啟瀏覽器與指定URL

@@ -9,6 +9,7 @@ Y = np.array([1, 1, 1, 2, 2, 2])
 
 #import 高斯素樸貝氏
 from sklearn.naive_bayes import GaussianNB
+#初始化分類器
 clf = GaussianNB()
 #fit  等同於訓練的意思 (給定  training data)
 clf.fit(X, Y)

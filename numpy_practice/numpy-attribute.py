@@ -6,6 +6,6 @@ sample_array=np.array([[1,2,3],[2,3,4]])
 
 #取得相關屬性
 print ("維度:",sample_array.ndim)
-print ("行數與列數:",sample_array.shape)
+print ("列數與行數:",sample_array.shape)
 print ("元素個數:",sample_array.size)
 

@@ -20,90 +20,89 @@ from sklearn.neural_network import MLPRegressor as MLP
 # dt.hour
 
 
-
 #目前的目錄
 root_dir=os.getcwd()
 
 #放檔案的目錄路徑
-data_dir="data"+"\\"+"400300"+"\\"+"train"+"\\"
-
+train_data_dir="data"+"\\"+"400300"+"\\"+"train"+"\\"
+test_data_dir="data"+"\\"+"400300"+"\\"+"test"+"\\"
 
 #data目錄下各資料夾的list
-data_dir_list=os.listdir(data_dir)
-#資料的名稱
+train_data_dir_list=os.listdir(train_data_dir)
+test_data_dir_list=os.listdir(test_data_dir)
 
+#資料檔的名稱
 data_name_xls="pems_output.xls"
 
-#所有資料的dataframe 陣列
-file_dfs=[]
 
-for dir in data_dir_list:
-    file_excel=get_time_flow(read_xls_file(data_dir+dir+"\\"+data_name_xls,'Report Data'))
-    file_dfs.append(file_excel.iloc[:,1])
+#train資料
+train_file_dfs=[]
+#test資料
+test_file_dfs=[]
+
+#將train 的資料加入
+for dir in train_data_dir_list:
+    file_excel=get_time_flow(read_xls_file(train_data_dir+dir+"\\"+data_name_xls,'Report Data'))
+    train_file_dfs.append(file_excel.iloc[:,1])
 
     
-#格式化資料
-train_data=format_data_combine(5,1,file_dfs)
-# train_data=format_data(5,1,file_dfs[4])
+#將test的資料加入
+for dir in test_data_dir_list:
+    file_excel=get_time_flow(read_xls_file(test_data_dir+dir+"\\"+data_name_xls,'Report Data'))
+    test_file_dfs.append(file_excel.iloc[:,1])
 
+    
+#格式化資料  
 
+#原始資料轉為sliding windows的方式  
+train_data=format_data(5,1,train_file_dfs[4])
+test_data=format_data(5,1,test_file_dfs[0])
 
 #取出feature與target 並轉為np array 提供機器學習演算法運算
-train_feature=(train_data.iloc[:,0:8]).as_matrix(columns=None)
-train_target=(train_data.iloc[:,8]).as_matrix(columns=None)
-# train_feature=(train_data.iloc[:,0:4]).as_matrix(columns=None)
-# train_target=(train_data.iloc[:,4]).as_matrix(columns=None)
+train_data_feature=(train_data.iloc[:,0:4]).as_matrix(columns=None)
+train_data_target=(train_data.iloc[:,4]).as_matrix(columns=None)
+test_data_feature=(test_data.iloc[:,0:4]).as_matrix(columns=None)
+test_data_target=(test_data.iloc[:,4]).as_matrix(columns=None)
+
+
+#原始資料轉為sliding windows的方式 並加上歷史資料
+train_data_combine=format_data_combine(5,1,train_file_dfs)
+test_dfs=train_file_dfs[1:]+test_file_dfs
+test_data_combine=format_data_combine(5,1,test_dfs)
+
+#取出feature與target 並轉為np array 提供機器學習演算法運算
+train_data_combine_feature=(train_data_combine.iloc[:,0:8]).as_matrix(columns=None)
+train_data_combine_target=(train_data_combine.iloc[:,8]).as_matrix(columns=None)
+test_data_combine_feature=(test_data_combine.iloc[:,0:8]).as_matrix(columns=None)
+test_data_combine_target=(test_data_combine.iloc[:,8]).as_matrix(columns=None)
 
 
 #呼叫SVR演算法並指定參數
 clf = SVR(kernel="rbf",C=100,gamma=0.0001)
 #針對演算法 使用訓練資料fit (即訓練的意思)
-clf.fit(train_feature,train_target)
-#使用已經訓練過的模型進行預測原來的特徵資料
+clf.fit(train_data_feature,train_data_target)
+predict=draw_picture_with_clf(clf,test_data_feature,test_data_target)
 
-params=clf.get_params()
-print(params)
-
-y_predict=clf.predict(train_feature)
-
-#將結果化成圖
-
-x=np.arange(len(train_target))
-draw_picture(x,train_target,y_predict)
-
-
-#用測試資料 並計算結果
-data_dir_test="data"+"\\"+"400300"+"\\"+"test"+"\\"+"0523-0527"
-
-test_dfs=[]
-test_dfs.append(file_dfs[1])
-test_dfs.append(file_dfs[2])
-test_dfs.append(file_dfs[3])
-test_dfs.append(get_time_flow(read_xls_file(data_dir_test+"\\"+data_name_xls,'Report Data')).iloc[:,1])
-
-test_data=format_data_combine(5,1,test_dfs)
-# test_data=format_data(5,1,test_dfs[3])
-
-test_feature=(test_data.iloc[:,0:8]).as_matrix(columns=None)
-test_target=(test_data.iloc[:,8]).as_matrix(columns=None)
-# test_feature=(test_data.iloc[:,0:4]).as_matrix(columns=None)
-# test_target=(test_data.iloc[:,4]).as_matrix(columns=None)
-
-test_y_predict=clf.predict(test_feature)
+clf_combine= SVR(kernel="rbf",C=100,gamma=0.0001)
+#針對演算法 使用訓練資料fit (即訓練的意思)
+clf_combine.fit(train_data_combine_feature,train_data_combine_target)
+predict_combine=draw_picture_with_clf(clf_combine,test_data_combine_feature,test_data_combine_target)
 
 #衡量結果之公式 
 #MAPE sigma( (實際值-預測值)/ 實際值  *100 )/資料筆數
-MAPE=np.sum((abs(test_target-test_y_predict)/test_target*100))/len(test_target)
-print("MAPE:",MAPE)
+print("MAPE:",cal_mape(test_data_target,predict))
+print("MAPE_combine:",cal_mape(test_data_combine_target,predict_combine))
 
 
-print("score:",clf.score(test_feature, test_target))
+# print("score:",clf.score(test_data_feature, test_data_target))
 
 #AIC = log(e mle)+ 2d/n
-#n:資料筆數 d:參數個數  e mle=sigma((實際值-預測值)^2/資料筆數)
+#svr  c gamma 2個參數
+print("aic:",cal_aic(test_data_target,predict,2))
+print("aic_combine:",cal_aic(test_data_combine_target,predict_combine,2))
 #BIC=log(e mle)+ d log(n)/n
-
-
+print("bic:",cal_bic(test_data_target,predict,2))
+print("bic_combine:",cal_bic(test_data_combine_target,predict_combine,2))
 
 
 #演算法

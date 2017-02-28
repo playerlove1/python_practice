@@ -6,6 +6,7 @@ from sklearn.learning_curve import  validation_curve
 from sklearn.learning_curve import  learning_curve
 from sklearn.grid_search import GridSearchCV
 import numpy as np
+import math
 
 #讀檔的函式 
 def read_xls_file(filepath,sheetname):
@@ -106,6 +107,13 @@ def draw_picture(feature,target,y_predict):
     plt.title('Support Vector Regression')
     plt.legend()
     plt.show()
+#根據 演算法 特徵與目標(測試資料)  做出圖   
+def draw_picture_with_clf(clf,test_feature,test_target):
+    y_predict=clf.predict(test_feature)
+    #將結果化成圖
+    x=np.arange(len(test_feature))
+    draw_picture(x,test_target,y_predict)
+    return y_predict
 
 #畫出學習曲線(learning_curve)  傳入參數  演算法,特徵,目標
 def draw_learning_curve(clf, train_feature, train_target):
@@ -152,3 +160,20 @@ def show_grid_search(clf, parameter_candidates, train_feature, train_target):
     print('Best `C`:',clf_cv.best_estimator_.C)
     print('Best kernel:',clf_cv.best_estimator_.kernel)
     print('Best `gamma`:',clf_cv.best_estimator_.gamma)
+    
+ #MAPE sigma( (實際值-預測值)/ 實際值  *100 )/資料筆數
+def cal_mape(y,pred_y):
+   MAPE=np.sum((abs(y-pred_y)/y*100))/len(y)
+   return MAPE
+#AIC = log(e mle)+ 2d/n
+#n:資料筆數 d:參數個數  e mle=sigma((實際值-預測值)^2)/資料筆數
+def cal_aic(y,pred_y,d):
+    e_mle=np.sum((abs(y-pred_y)**2))/len(y)
+    aic=math.log(e_mle)+d/len(y)
+    return aic
+#BIC=log(e mle)+ d log(n)/n
+#n:資料筆數 d:參數個數  e mle=sigma((實際值-預測值)^2)/資料筆數
+def cal_bic(y,pred_y,d):
+    e_mle=np.sum((abs(y-pred_y)**2))/len(y)
+    bic=math.log(e_mle)+(d*math.log(len(y))/len(y))
+    return bic 

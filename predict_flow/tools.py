@@ -7,6 +7,7 @@ from sklearn.learning_curve import  learning_curve
 from sklearn.grid_search import GridSearchCV
 import numpy as np
 import math
+from sklearn import preprocessing
 
 #讀檔的函式 
 def read_xls_file(filepath,sheetname):
@@ -35,7 +36,7 @@ def format_data(windows_size,move_size,data_list):
            
     row_list=[]
     
-    for j in range(0,new_data_frame_rows-1):
+    for j in range(0,new_data_frame_rows):
         for k in range(0,new_data_frame_cols):
             row_list.append((data_list.iloc[j*move_size+k]))
             if (k%new_data_frame_cols==windows_size-move_size):
@@ -47,7 +48,7 @@ def format_data(windows_size,move_size,data_list):
         
     #產生欄位名稱
     c=[]
-    for j in range(1,new_data_frame_cols+1):
+    for j in range(0,new_data_frame_cols):
         c.append('data'+str(j))
         
     df_single=pd.DataFrame(all_list,columns=c)
@@ -96,10 +97,28 @@ def format_data_combine(windows_size,move_size,data_lists):
     
     return df_single
 
+###資料正規化
+
+# 標準差為1 平均值為0的正規化
+# preprocessing.scale(data)
+# 將train data的 scale 套用到 test data
+# preprocessing.StandardScaler().fit(train data).transform(test data)
+# 將資料正規化到[0,1]區間
+# preprocessing.MinMaxScaler().fit_transform(data)
+def scale_data(train,test):
+    train_data=preprocessing.StandardScaler().fit(train).transform(train)
+    test_data=preprocessing.StandardScaler().fit(train).transform(test)
+    return pd.DataFrame(train_data),pd.DataFrame(test_data),preprocessing.StandardScaler().fit(train)
+def scale_data_zero_to_one(train,test):
+    train_data=preprocessing.MinMaxScaler().fit_transform(train).transform(train)
+    test_data=preprocessing.MinMaxScaler().fit_transform(train).transform(test)
+    return train_data,test_data
+###做圖相關
+
 
 #根據 原始資料的x,y與預測資料  做出圖
 def draw_picture(feature,target,y_predict):
-    plt.scatter(feature, target, color='darkorange', label='data')
+    plt.plot(feature, target, color='darkorange', label='data')
     plt.hold('on')
     plt.plot(feature, y_predict, color='navy',lw=2,label='predict')
     plt.xlabel('time')
@@ -107,6 +126,22 @@ def draw_picture(feature,target,y_predict):
     plt.title('Support Vector Regression')
     plt.legend()
     plt.show()
+    
+#根據 原始資料的x,y與預測資料
+def draw_picture_compare(feature,target,predict,predict_combine):
+    x=np.arange(len(feature))*5
+    x_ticks=np.linspace(0,300,6)
+    plt.plot(x, target, color='darkorange', label='data')
+    plt.hold('on')
+    plt.plot(x, predict, color='navy',linestyle="--",lw=2,label='predict')
+    plt.plot(x, predict_combine, color='red',linestyle="--",label='predict_combine')
+    plt.xlabel('time')
+    plt.ylabel('veh/5 Minutes')
+    plt.title('Support Vector Regression')
+    plt.xticks(x_ticks)
+    plt.legend()
+    plt.show()
+    
 #根據 演算法 特徵與目標(測試資料)  做出圖   
 def draw_picture_with_clf(clf,test_feature,test_target):
     y_predict=clf.predict(test_feature)
@@ -114,6 +149,16 @@ def draw_picture_with_clf(clf,test_feature,test_target):
     x=np.arange(len(test_feature))
     draw_picture(x,test_target,y_predict)
     return y_predict
+
+    
+#取得該演算法 使用特徵的預測值
+def get_y_predict(clf,test_feature):
+    y_predict=clf.predict(test_feature)
+    return y_predict
+    
+
+###衡量參數
+    
 
 #畫出學習曲線(learning_curve)  傳入參數  演算法,特徵,目標
 def draw_learning_curve(clf, train_feature, train_target):
@@ -160,8 +205,28 @@ def show_grid_search(clf, parameter_candidates, train_feature, train_target):
     print('Best `C`:',clf_cv.best_estimator_.C)
     print('Best kernel:',clf_cv.best_estimator_.kernel)
     print('Best `gamma`:',clf_cv.best_estimator_.gamma)
+
+###MLP演算法
+
+def draw_mlp(clf,train,test):
+    train_data_combine,test_data_combine,n_scale=scale_data(train,test)
     
- #MAPE sigma( (實際值-預測值)/ 實際值  *100 )/資料筆數
+    train_data_combine_feature=(train_data_combine.iloc[:,0:8]).as_matrix(columns=None)
+    train_data_combine_target=(train_data_combine.iloc[:,8]).as_matrix(columns=None)
+    test_data_combine_feature=(test_data_combine.iloc[:,0:8]).as_matrix(columns=None)
+    test_data_combine_target=(test_data_combine.iloc[:,8]).as_matrix(columns=None)
+    clf.fit(train_data_combine_feature,train_data_combine_target)
+    
+    # print(pd.concat([pd.DataFrame(test_data_combine_feature),pd.DataFrame(get_y_predict(clf,test_data_combine_feature))],axis=1))
+    predict=n_scale.inverse_transform(pd.concat([pd.DataFrame(test_data_combine_feature),pd.DataFrame(get_y_predict(clf,test_data_combine_feature))],axis=1))
+    # print(predict[:,8])
+    target=n_scale.inverse_transform(pd.concat([pd.DataFrame(test_data_combine_feature),pd.DataFrame(test_data_combine_target)],axis=1))
+    draw_picture(np.arange(len(test_data_combine_feature)),target[:,8],predict[:,8])
+    
+
+###衡量標準
+    
+#MAPE sigma( (實際值-預測值)/ 實際值  *100 )/資料筆數
 def cal_mape(y,pred_y):
    MAPE=np.sum((abs(y-pred_y)/y*100))/len(y)
    return MAPE

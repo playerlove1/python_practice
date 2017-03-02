@@ -105,14 +105,15 @@ def format_data_combine(windows_size,move_size,data_lists):
 # preprocessing.StandardScaler().fit(train data).transform(test data)
 # 將資料正規化到[0,1]區間
 # preprocessing.MinMaxScaler().fit_transform(data)
+
 def scale_data(train,test):
     train_data=preprocessing.StandardScaler().fit(train).transform(train)
     test_data=preprocessing.StandardScaler().fit(train).transform(test)
     return pd.DataFrame(train_data),pd.DataFrame(test_data),preprocessing.StandardScaler().fit(train)
 def scale_data_zero_to_one(train,test):
-    train_data=preprocessing.MinMaxScaler().fit_transform(train).transform(train)
-    test_data=preprocessing.MinMaxScaler().fit_transform(train).transform(test)
-    return train_data,test_data
+    train_data=preprocessing.MinMaxScaler().fit(train).transform(test)
+    test_data=preprocessing.MinMaxScaler().fit(train).transform(test)
+    return pd.DataFrame(train_data),pd.DataFrame(test_data),preprocessing.StandardScaler().fit(train)
 ###做圖相關
 
 
@@ -128,7 +129,7 @@ def draw_picture(feature,target,y_predict):
     plt.show()
     
 #根據 原始資料的x,y與預測資料
-def draw_picture_compare(feature,target,predict,predict_combine):
+def draw_picture_compare(feature,target,predict,predict_combine,title):
     x=np.arange(len(feature))*5
     x_ticks=np.linspace(0,300,6)
     plt.plot(x, target, color='darkorange', label='data')
@@ -137,7 +138,7 @@ def draw_picture_compare(feature,target,predict,predict_combine):
     plt.plot(x, predict_combine, color='red',linestyle="--",label='predict_combine')
     plt.xlabel('time')
     plt.ylabel('veh/5 Minutes')
-    plt.title('Support Vector Regression')
+    plt.title(title)
     plt.xticks(x_ticks)
     plt.legend()
     plt.show()
@@ -207,8 +208,19 @@ def show_grid_search(clf, parameter_candidates, train_feature, train_target):
     print('Best `gamma`:',clf_cv.best_estimator_.gamma)
 
 ###MLP演算法
-
-def draw_mlp(clf,train,test):
+def cal_mlp(clf,train,test):
+    train_data_combine,test_data_combine,n_scale=scale_data(train,test)
+    
+    train_data_combine_feature=(train_data_combine.iloc[:,0:4]).as_matrix(columns=None)
+    train_data_combine_target=(train_data_combine.iloc[:,4]).as_matrix(columns=None)
+    test_data_combine_feature=(test_data_combine.iloc[:,0:4]).as_matrix(columns=None)
+    test_data_combine_target=(test_data_combine.iloc[:,4]).as_matrix(columns=None)
+    clf.fit(train_data_combine_feature,train_data_combine_target)
+    
+    predict=n_scale.inverse_transform(pd.concat([pd.DataFrame(test_data_combine_feature),pd.DataFrame(get_y_predict(clf,test_data_combine_feature))],axis=1))
+    target=n_scale.inverse_transform(pd.concat([pd.DataFrame(test_data_combine_feature),pd.DataFrame(test_data_combine_target)],axis=1))
+    return predict[:,4]
+def cal_mlp_combine(clf,train,test):
     train_data_combine,test_data_combine,n_scale=scale_data(train,test)
     
     train_data_combine_feature=(train_data_combine.iloc[:,0:8]).as_matrix(columns=None)
@@ -221,9 +233,38 @@ def draw_mlp(clf,train,test):
     predict=n_scale.inverse_transform(pd.concat([pd.DataFrame(test_data_combine_feature),pd.DataFrame(get_y_predict(clf,test_data_combine_feature))],axis=1))
     # print(predict[:,8])
     target=n_scale.inverse_transform(pd.concat([pd.DataFrame(test_data_combine_feature),pd.DataFrame(test_data_combine_target)],axis=1))
-    draw_picture(np.arange(len(test_data_combine_feature)),target[:,8],predict[:,8])
+    # draw_picture(np.arange(len(test_data_combine_feature)),target[:,8],predict[:,8])
+    return predict[:,8]
+###GPR演算法
+def cal_gpr(clf,train,test):
+    train_data_combine,test_data_combine,n_scale=scale_data_zero_to_one(train,test)
     
-
+    train_data_combine_feature=(train_data_combine.iloc[:,0:4]).as_matrix(columns=None)
+    train_data_combine_target=(train_data_combine.iloc[:,4]).as_matrix(columns=None)
+    test_data_combine_feature=(test_data_combine.iloc[:,0:4]).as_matrix(columns=None)
+    test_data_combine_target=(test_data_combine.iloc[:,4]).as_matrix(columns=None)
+    clf.fit(train_data_combine_feature,train_data_combine_target)
+    
+    predict=n_scale.inverse_transform(pd.concat([pd.DataFrame(test_data_combine_feature),pd.DataFrame(get_y_predict(clf,test_data_combine_feature))],axis=1))
+    target=n_scale.inverse_transform(pd.concat([pd.DataFrame(test_data_combine_feature),pd.DataFrame(test_data_combine_target)],axis=1))
+    return predict[:,4]    
+def cal_gpr_combine(clf,train,test):
+    train_data_combine,test_data_combine,n_scale=scale_data_zero_to_one(train,test)
+    
+    train_data_combine_feature=(train_data_combine.iloc[:,0:8]).as_matrix(columns=None)
+    train_data_combine_target=(train_data_combine.iloc[:,8]).as_matrix(columns=None)
+    test_data_combine_feature=(test_data_combine.iloc[:,0:8]).as_matrix(columns=None)
+    test_data_combine_target=(test_data_combine.iloc[:,8]).as_matrix(columns=None)
+    clf.fit(train_data_combine_feature,train_data_combine_target)
+    
+    # print(pd.concat([pd.DataFrame(test_data_combine_feature),pd.DataFrame(get_y_predict(clf,test_data_combine_feature))],axis=1))
+    predict=n_scale.inverse_transform(pd.concat([pd.DataFrame(test_data_combine_feature),pd.DataFrame(get_y_predict(clf,test_data_combine_feature))],axis=1))
+    # print(predict[:,8])
+    target=n_scale.inverse_transform(pd.concat([pd.DataFrame(test_data_combine_feature),pd.DataFrame(test_data_combine_target)],axis=1))
+    # draw_picture(np.arange(len(test_data_combine_feature)),target[:,8],predict[:,8])
+    return predict[:,8]
+    
+    
 ###衡量標準
     
 #MAPE sigma( (實際值-預測值)/ 實際值  *100 )/資料筆數

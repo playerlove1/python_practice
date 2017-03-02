@@ -4,6 +4,8 @@ import numpy as np
 from tools import *
 from sklearn.svm import SVR
 from sklearn.neural_network import MLPRegressor as MLP
+from sklearn.gaussian_process import GaussianProcessRegressor as GPR
+from sklearn.gaussian_process.kernels import WhiteKernel, ExpSineSquared
 
 
 # 日期字串
@@ -99,7 +101,7 @@ predict_combine=get_y_predict(clf_combine,test_data_combine_feature)
 
 
 
-draw_picture_compare(test_data_combine_feature,test_data_combine_target,predict,predict_combine)
+draw_picture_compare(test_data_combine_feature,test_data_combine_target,predict,predict_combine,'Support Vector Regression')
 
 #衡量結果之公式 
 #MAPE sigma( (實際值-預測值)/ 實際值  *100 )/資料筆數
@@ -122,7 +124,37 @@ print("bic_combine:",cal_bic(test_data_combine_target,predict_combine,2))
 #演算法
 #NN (類神經網路)
 clf_nn=MLP(hidden_layer_sizes=5,activation="logistic")
-draw_mlp(clf_nn,train_data_combine,test_data_combine)
+predict_mlp=cal_mlp(clf_nn,train_data,test_data)
+print("MAPE_mlp:",cal_mape(test_data_target,predict_mlp))
+
+predict_mlp_combine=cal_mlp_combine(clf_nn,train_data_combine,test_data_combine)
+print("MAPE_mlp_combine:",cal_mape(test_data_combine_target,predict_mlp_combine))
+
+
+draw_picture_compare(test_data_combine_feature,test_data_combine_target,predict_mlp,predict_mlp_combine,'MLPRegressor')
+
+print(clf_nn.get_params)
+
+print("aic_mlp:",cal_aic(test_data_target,predict_mlp,6))
+print("aic_combine_mlp:",cal_aic(test_data_combine_target,predict_mlp_combine,6))
+
+print("bic_mlp:",cal_bic(test_data_target,predict_mlp,6))
+print("bic_combine_mlp:",cal_bic(test_data_combine_target,predict_mlp_combine,6))
+
+
+
+gp_kernel = ExpSineSquared(1.0, 5.0, periodicity_bounds=(1e-2, 1e1)) \
+    + WhiteKernel(1e-1)
+  
+clf_gpr=GPR(kernel=gp_kernel)
+predict_gpr=cal_gpr(clf_gpr,train_data,test_data)
+print("MAPE_gpr:",cal_mape(test_data_target,predict_gpr))
+predict_gpr_combine=cal_gpr_combine(clf_gpr,train_data_combine,test_data_combine)
+print("MAPE_gpr_combine:",cal_mape(test_data_combine_target,predict_gpr_combine))
+
+
+
+draw_picture_compare(test_data_combine_feature,test_data_combine_target,predict_mlp,predict_mlp_combine,'GaussianProcessRegressor')
 # clf_nn.fit(train_data_combine_feature,train_data_combine_target)
 
 # MAPE=np.sum((abs(test_target-test_y_predict)/test_target*100))/len(test_target)

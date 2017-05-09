@@ -129,19 +129,25 @@ def draw_picture(feature,target,y_predict):
     plt.show()
     
 #根據 原始資料的x,y與預測資料
-def draw_picture_compare(feature,target,predict,predict_combine,title):
+def draw_picture_compare(feature,target,predict,predict_combine,title,filename):
+    
     x=np.arange(len(feature))*5
     x_ticks=np.linspace(0,300,6)
-    plt.plot(x, target, color='darkorange', label='data')
+    x_ticks_name=['5:00','6:00','7:00','8:00','9:00','10:00']
+    plt.plot(x, target, color='black', label='data')
     plt.hold('on')
-    plt.plot(x, predict, color='navy',linestyle="--",lw=2,label='predict')
-    plt.plot(x, predict_combine, color='red',linestyle="--",label='predict_combine')
+    plt.plot(x, predict, color='navy',linestyle="--",lw=2,label='sliding window_only')
+    plt.plot(x, predict_combine, color='red',linestyle="--",label='our_method')
     plt.xlabel('time')
     plt.ylabel('veh/5 Minutes')
     plt.title(title)
-    plt.xticks(x_ticks)
+    
+    plt.xticks(x_ticks,x_ticks_name)
     plt.legend()
-    plt.show()
+    # plt.show()
+    plt.savefig(filename)
+    plt.close()
+
     
 #根據 演算法 特徵與目標(測試資料)  做出圖   
 def draw_picture_with_clf(clf,test_feature,test_target):
@@ -269,6 +275,7 @@ def cal_gpr_combine(clf,train,test):
     
 #MAPE sigma( (實際值-預測值)/ 實際值  *100 )/資料筆數
 def cal_mape(y,pred_y):
+   # print(np.sum((abs(y-pred_y)/y*100)))
    MAPE=np.sum((abs(y-pred_y)/y*100))/len(y)
    return MAPE
 #AIC = log(e mle)+ 2d/n
@@ -283,3 +290,15 @@ def cal_bic(y,pred_y,d):
     e_mle=np.sum((abs(y-pred_y)**2))/len(y)
     bic=math.log(e_mle)+(d*math.log(len(y))/len(y))
     return bic 
+    
+    
+def save_file(VDS_IDs,name,list):
+    f=open('result_'+name+'.txt','w')
+    
+    i=0
+    for id in VDS_IDs:
+        string=id+'  '
+        string+=str(list[i])+' '+str(list[i+1])+' '+str(list[i+2])       
+        f.write(string+'\n')
+        i=i+3
+    

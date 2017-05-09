@@ -29,6 +29,9 @@ root_dir=os.getcwd()
 train_data_dir="data"+"\\"+"400300"+"\\"+"train"+"\\"
 test_data_dir="data"+"\\"+"400300"+"\\"+"test"+"\\"
 
+# train_data_dir="data1"+"\\"+"400868"+"\\"+"train"+"\\"
+# test_data_dir="data1"+"\\"+"400868"+"\\"+"test"+"\\"
+
 #data目錄下各資料夾的list
 train_data_dir_list=os.listdir(train_data_dir)
 test_data_dir_list=os.listdir(test_data_dir)

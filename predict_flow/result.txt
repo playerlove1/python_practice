@@ -1,7 +1,0 @@
- MAPE:
-gamma (default)
- 9.21013772261  (feature:8 target:1)
- 9.24233014098  (feature:4 target:1)
-gamma (0.001)
- 8.90773012249  (feature:8 target:1)
- 9.16746308848  (feature:4 target:1)

@@ -5,7 +5,7 @@ from sklearn import datasets
 import matplotlib.pyplot as plt
 from perceptron import Perceptron
 from decision_bondary import plot_decision_regions
-
+from AdalineGD  import AdalineGD
 #讀取資料
 iris = datasets.load_iris()
 # iris=pd.read_csv('https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data', header=None)
@@ -56,3 +56,28 @@ plt.show()
 #決策邊界
 plot_decision_regions(X, y, classifier=ppn)
 
+
+#畫adalineGD不同學習速率的圖
+
+
+fig, ax =plt.subplots(1,2, figsize=(8,4))
+
+
+
+ada1=AdalineGD(n_iter=10, eta=0.01).fit(X,y)
+ax[0].plot(range(1, len(ada1.cost_)+1), np.log10(ada1.cost_), marker='o')
+ax[0].set_title('Adaline - Learning rate 0.01')
+ax[0].set_xlabel('Epochs')
+ax[0].set_ylabel('log(sum-square-error)')
+
+            
+ada2=AdalineGD(n_iter=10, eta=0.0001).fit(X,y)   
+ax[1].plot(range(1, len(ada2.cost_)+1), ada2.cost_, marker='o')
+ax[1].set_title("Adaline - Learning rate 0.0001") 
+ax[1].set_xlabel('Epochs')
+ax[1].set_ylabel('sum-square-error')
+   
+
+
+   
+plt.show()

@@ -98,8 +98,8 @@ class AdalineSGD (object):
         error = target - output
         self.w_[1:] += self.eta * xi.dot(error)
         self.w_[0] += self.eta * error
-        cost = 0.5 * error**2
-        # cost =(error**2).sum() /2.0
+        # cost = 0.5 * error**2
+        cost =(error**2) /2.0
         return cost
         
     def net_input(self, X):

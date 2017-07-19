@@ -1,5 +1,7 @@
 from cnn import CNN
 from enn import ENN
+from renn import RENN
+from rnn import RNN
 import numpy as np
 from sklearn import datasets
 import matplotlib.pyplot as plt
@@ -32,6 +34,7 @@ X=iris.data[0:150,[0,2]]
 # y = np.where(y == 'Iris-setosa', -1, 1)
 # X = iris.iloc[0:100,[0,2]].values
 
+
 # 前50個會是同類
 plt.scatter(X[:50, 0], X[:50, 1], color='red', marker='o', label='setosa')
 # 後50個是另一類
@@ -45,6 +48,10 @@ plt.xlabel('petal length')
 plt.ylabel('sepal length')
 plt.legend(loc='upper left')
 plt.show()
+
+''' 
+
+#CNN
 
 cnn = CNN()
 reduce_X, reduce_y = cnn.reduce_data(X, y)
@@ -77,34 +84,103 @@ plt.xlabel('petal length')
 plt.ylabel('sepal length')
 plt.legend(loc='upper left')
 plt.show()
-
 '''
+
+
+#ENN
 enn = ENN()
-# X = np.array([[-1, 0], [-0.8, 1], [-0.8, -1], [-0.5, 0] , [0.5, 0], [1, 0], [0.8, 1], [0.8, -1]])
-# y = np.array([1, 1, 1, 2, 1, 2, 2, 2])
+
 reduce_X, reduce_y =enn.reduce_data(X,y)
-# reduce_X, reduce_y = enn.reduce_data(X, y)
 
 
+type1=np.where(reduce_y == 0)
 
-type1=np.where(reduce_y == -1)
-print(str(type1))
 type2=np.where(reduce_y == 1)
-print(str(type2))
 
-# 前50個會是同類
+type3=np.where(reduce_y == 2)
+
+# 1~50是同類
 plt.scatter(X[:50, 0], X[:50, 1], color='red', marker='o', label='setosa')
-# 後50個是另一類
+# 50~100是另一類
 plt.scatter(X[50:100, 0], X[50:100, 1], color='blue', marker='x', label='versicolor')
+# 100~150是另一類
+plt.scatter(X[100:150, 0], X[100:150, 1], color='black', marker='s', label='versicolor')
 
 plt.scatter(reduce_X[type1, 0], reduce_X[type1, 1], color='green', marker='*', label='is setosa')
 plt.scatter(reduce_X[type2, 0],reduce_X[type2, 1], color='yellow', marker='*', label='is versicolor')
+plt.scatter(reduce_X[type3, 0],reduce_X[type3, 1], color='pink', marker='*', label='is virginica')
 
-
+print('len:'+str(len(reduce_X)))
 #顯示類別圖
 plt.title('reduce enn')
 plt.xlabel('petal length')
 plt.ylabel('sepal length')
 plt.legend(loc='upper left')
 plt.show()
+
+
+'''
+
+#RENN
+renn = RENN()
+
+reduce_X, reduce_y =renn.reduce_data(X,y)
+
+
+type1=np.where(reduce_y == 0)
+
+type2=np.where(reduce_y == 1)
+
+type3=np.where(reduce_y == 2)
+
+# 1~50是同類
+plt.scatter(X[:50, 0], X[:50, 1], color='red', marker='o', label='setosa')
+# 50~100是另一類
+plt.scatter(X[50:100, 0], X[50:100, 1], color='blue', marker='x', label='versicolor')
+# 100~150是另一類
+plt.scatter(X[100:150, 0], X[100:150, 1], color='black', marker='s', label='versicolor')
+
+plt.scatter(reduce_X[type1, 0], reduce_X[type1, 1], color='green', marker='*', label='is setosa')
+plt.scatter(reduce_X[type2, 0],reduce_X[type2, 1], color='yellow', marker='*', label='is versicolor')
+plt.scatter(reduce_X[type3, 0],reduce_X[type3, 1], color='pink', marker='*', label='is virginica')
+
+
+#顯示類別圖
+plt.title('reduce renn')
+plt.xlabel('petal length')
+plt.ylabel('sepal length')
+plt.legend(loc='upper left')
+plt.show()
+'''
+'''
+rnn = RNN()
+
+reduce_X, reduce_y =rnn.reduce_data(X,y)
+
+
+type1=np.where(reduce_y == 0)
+
+type2=np.where(reduce_y == 1)
+
+type3=np.where(reduce_y == 2)
+
+# 1~50是同類
+plt.scatter(X[:50, 0], X[:50, 1], color='red', marker='o', label='setosa')
+# 50~100是另一類
+plt.scatter(X[50:100, 0], X[50:100, 1], color='blue', marker='x', label='versicolor')
+# 100~150是另一類
+plt.scatter(X[100:150, 0], X[100:150, 1], color='black', marker='s', label='versicolor')
+
+plt.scatter(reduce_X[type1, 0], reduce_X[type1, 1], color='green', marker='*', label='is setosa')
+plt.scatter(reduce_X[type2, 0],reduce_X[type2, 1], color='yellow', marker='*', label='is versicolor')
+plt.scatter(reduce_X[type3, 0],reduce_X[type3, 1], color='pink', marker='*', label='is virginica')
+
+
+#顯示類別圖
+plt.title('reduce rnn')
+plt.xlabel('petal length')
+plt.ylabel('sepal length')
+plt.legend(loc='upper left')
+plt.show()
+
 '''

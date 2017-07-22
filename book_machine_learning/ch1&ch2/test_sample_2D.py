@@ -42,26 +42,28 @@ plt.ylabel('sepal length')
 plt.legend(loc='upper left')
 plt.show()
 
-#Perceptron
+'''
+Perceptron 範例圖(每輪的錯誤率) 成本下降曲線圖
+'''
 ppn=Perceptron(eta=0.1, n_iter=10)
 ppn.fit(X,y)
 plt.plot(range(1,len(ppn.errors_)+1), ppn.errors_, marker='o')
 plt.xlabel('Epochs')
 plt.ylabel("Number of misclassifications")
 plt.show()
-
-#決策邊界
+'''
+Perceptron 之決策邊界圖
+'''
 plot_decision_regions(X, y, classifier=ppn)
 plt.xlabel('petal length [cm]')
 plt.ylabel('sepal length [cm]')
 plt.legend(loc='upper left')
 plt.show()
 
-
-#(使用subplots)
-#畫adalineGD不同學習速率的圖   
+'''
+使用subplot 比較adalineGD在不同學習速率時的圖 (0.1與0.0001)時每輪的誤差 (成本下降曲線圖)
+'''
 fig, ax =plt.subplots(1,2, figsize=(8,4))
-
 #第一種learning rate的情況
 ada1=AdalineGD(n_iter=10, eta=0.01).fit(X,y)
 #x軸為不同回合的結果  y軸為取log後的cost 
@@ -81,8 +83,12 @@ plt.show()
 
 
 
-
-
+'''
+使用subplot 
+(有先將資料進行標準化:讓特徵值滿足標準常態分配 Standard normal distribution 並且每個特徵的平均值都是0))
+左圖:AdalineGD決策邊界圖
+右圖:AdalineGD成本下降曲線圖
+'''
 #(使用subplots)
 #畫決策邊界跟成本下降的曲線圖 (AdalineGD)
 fig, ax =plt.subplots(1,2, figsize=(12,6))
@@ -116,9 +122,12 @@ ax[1].set_ylabel('sum-square-error')
 plt.show()
 
 
-
-#(使用subplots)
-#畫決策邊界跟成本下降的曲線圖 (AdalineSGD)
+'''
+使用subplot 
+(有先將資料進行標準化:讓特徵值滿足標準常態分配 Standard normal distribution 並且每個特徵的平均值都是0))
+左圖:AdalineSGD決策邊界圖
+右圖:AdalineSGD成本下降曲線圖
+'''
 fig, ax =plt.subplots(1,2, figsize=(12,6))
 
 #決策邊界
@@ -133,7 +142,7 @@ ax[0].set_xlabel('sepal length [cm][standardlized]')
 ax[0].set_ylabel('petal length [cm][standardlized]')
 ax[0].legend(loc='upper left')
 
-#成本下降曲線圖 (AdalineGD)
+#成本下降曲線圖 (AdalineSGD)
 ax[1].plot(range(1, len(adaSGD.cost_)+1), adaSGD.cost_, marker='o')
 ax[1].set_title("Adaline - Learning rate 0.01 [standardlized] SGD") 
 ax[1].set_xlabel('Epochs')
@@ -153,3 +162,4 @@ plt.plot(range(1, len(adaSGD.cost_)+1), adaSGD.cost_, color='red',linestyle="--"
 plt.legend(loc='upper left')
 
 plt.show()
+

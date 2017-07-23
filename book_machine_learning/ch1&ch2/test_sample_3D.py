@@ -1,14 +1,13 @@
 import numpy as np
-import pandas as pd
 from sklearn import datasets
 from sklearn.cross_validation import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import Perceptron
 from sklearn.metrics import accuracy_score
-from plot_decision_regions import plot_decision_regions
 import matplotlib.pyplot as plt
-
-
+import sys
+sys.path.append("..")
+from plot_decision_regions import plot_decision_regions
 #讀取資料
     #使用sklearn的dataset
     #透過iris.target取出y  並且取出前100筆資料

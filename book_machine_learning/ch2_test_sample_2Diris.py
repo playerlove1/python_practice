@@ -3,11 +3,14 @@ import numpy as np
 import pandas as pd
 from sklearn import datasets
 import matplotlib.pyplot as plt
-from perceptron import Perceptron
-from decision_bondary import plot_decision_regions
-# from plot_decision_regions import plot_decision_regions
-from AdalineGD  import AdalineGD
-from AdalineSGD  import AdalineSGD
+from sample_moudle.algorithm.ch2.perceptron import Perceptron
+from sample_moudle.algorithm.ch2.AdalineGD  import AdalineGD
+from sample_moudle.algorithm.ch2.AdalineSGD  import AdalineSGD
+
+from sample_moudle.visual.decision_bondary import plot_decision_regions
+# from sample_moudle.visual.plot_decision_regions import plot_decision_regions
+
+
 import time
 #讀取資料
     #使用sklearn的dataset

@@ -8,11 +8,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 import matplotlib.pyplot as plt
-import sys
-sys.path.append("..")
-from plot_decision_regions import plot_decision_regions
-
-
+from sample_moudle.visual.plot_decision_regions import plot_decision_regions
 
 '''
 線性可分的資料

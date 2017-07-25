@@ -5,9 +5,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import Perceptron
 from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
-import sys
-sys.path.append("..")
-from plot_decision_regions import plot_decision_regions
+
+from sample_moudle.visual.plot_decision_regions import plot_decision_regions
 #讀取資料
     #使用sklearn的dataset
     #透過iris.target取出y  並且取出前100筆資料
@@ -24,7 +23,7 @@ sc = StandardScaler()
 sc.fit(X_train)
 X_train_std = sc.transform(X_train)
 X_test_std = sc.transform(X_test)
-
+ 
 #sklearn中的分類演算法  大多利用 一對餘(One-vs.-Rest,OvR)的方法來支援多元分類
 ppn = Perceptron(n_iter=40, eta0=0.01, random_state=0)
 ppn.fit(X_train_std, y_train)

@@ -78,7 +78,7 @@ print("one hot encoding:\n",X_ohe)
 X_pd_dummies = pd.get_dummies(df[['price', 'color', 'size']])
 print("利用pandas的get_dummies方法:\n",X_pd_dummies)
 
-#
+#UCI wine dataset
 uci_wine_url='https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data'
 df_wine = pd.read_csv(uci_wine_url, header=None)
 df_wine.columns= ['Class label','Alcohol', 'Malic acid', 'Ash', 'Alcalinity of ash',\
@@ -139,7 +139,7 @@ plt.legend(loc='upper left')
 ax.legend(loc='lower left', fancybox=True)
 plt.show()
 
-#
+#SBS 在不同k值下的準確度
 knn = KNeighborsClassifier(n_neighbors=2)
 sbs = SBS(knn, k_features=1)
 sbs.fit(X_train_std, y_train)
@@ -151,6 +151,7 @@ plt.xlabel('Number of features')
 plt.grid()
 plt.show()
 
+#哪五個特徵對驗證數據集
 k5 = list(sbs.subsets_[8])
 print(df_wine.columns[1:][k5])
 knn.fit(X_train_std, y_train)
@@ -177,8 +178,8 @@ plt.tight_layout()
 plt.show()
 
 sfm = SelectFromModel(forest, threshold=0.15, prefit=True)
-X_selected = sfm.transform(X_train)
+# X_selected = sfm.transform(X_train)
 
-for f in range(X_selected.shape[1]):
-    print("%2d) %-*s %f" % (f + 1, 30, feat_labels[indices[f]], importances[indices[f]]))
+# for f in range(X_selected.shape[1]):
+    # print("%2d) %-*s %f" % (f + 1, 30, feat_labels[indices[f]], importances[indices[f]]))
 

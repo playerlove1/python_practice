@@ -75,7 +75,7 @@ class CNN():
         #針對所有樣本
         for feature, target in zip(X, y):
             #如果跟分類器裡的不一致
-            if self.classifier.predict(feature) != [target]:
+            if self.classifier.predict(feature.reshape(1, -1)) != [target]:
                 #就把該點加入prots_s
                 subset_X = subset_X + [feature]
                 #labels_s加入目前執行的instance之類別
@@ -87,9 +87,9 @@ class CNN():
         self.X_ = np.asarray(subset_X)
         self.y_ = np.asarray(subset_y)
         self.reduction_ = 1.0 - float(len(self.y_))/len(y)
-        print("reduction_X:"+str(self.X_ ))
-        print("eduction_y:"+str(self.y_))
-        print("reduction:"+str(self.reduction_))
+        # print("reduction_X:"+str(self.X_ ))
+        # print("eduction_y:"+str(self.y_))
+        # print("reduction:"+str(self.reduction_))
         
         return self.X_, self.y_
         

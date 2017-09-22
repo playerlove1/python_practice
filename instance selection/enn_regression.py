@@ -28,15 +28,15 @@ class ENNR():
             return self.X_, self.y_
             
         #初始樣本子集的遮罩(預設全被都挑出來)
-        mask = np.ones(y.size, dtype=bool)
+        drop_mask = np.ones(y.size, dtype=bool)
         #依序移除每個樣本的遮罩
-        tmp_m = np.ones(y.size, dtype=bool)
+        tmp_mask = np.ones(y.size, dtype=bool)
         
         #依序拿掉每個樣本
         for i in range(y.size):
-            tmp_m[i] = not tmp_m[i]
+            tmp_mask[i] = not tmp_mask[i]
             #用拿掉第i個樣本的資料進行迴歸模型的訓練
-            self.model.fit(X[tmp_m], y[tmp_m])
+            self.model.fit(X[tmp_mask], y[tmp_mask])
             #第i個樣本的資料
             feature, target = X[i], y[i]
             #計算迴歸模型對第i個樣本的預測資料
@@ -46,13 +46,13 @@ class ENNR():
             
             #如果拿掉第i個樣本樣本的迴歸大於門檻值將會被視為分類錯誤被移除 
             if abs(target-y_pred) > threshold:
-                mask[i] = not mask[i]
+                drop_mask[i] = not drop_mask[i]
             
             #再將第i個樣本補回去
-            tmp_m[i] = not tmp_m[i]
+            tmp_mask[i] = not tmp_mask[i]
 
-        self.X_ = np.asarray(X[mask])
-        self.y_ = np.asarray(y[mask])
+        self.X_ = np.asarray(X[drop_mask])
+        self.y_ = np.asarray(y[drop_mask])
         self.reduction_ = 1.0 - float(len(self.y_)) / len(y)
         
         #print("reduction_X:"+str(self.X_ ))

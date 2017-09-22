@@ -40,7 +40,7 @@ class ENN():
             feature, target = X[i], y[i]
             
             #如果拿掉第i個樣本樣本的KNN 可以正確分類第i個樣本 則在mask中將該index所在的值改為True  
-            if self.classifier.predict(feature) == [target]:
+            if self.classifier.predict(feature.reshape(1, -1)) == [target]:
                 mask[i] = not mask[i]
             
             #再將第i個樣本補回去

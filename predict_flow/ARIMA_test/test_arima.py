@@ -10,7 +10,7 @@ from sklearn.metrics import mean_squared_error
 
 #解析器  將'1-01'  對應為 1991 1月 以datetime的形式呈現
 def parser(x):
-	return pd.datetime.strptime('190'+str(x), '%Y-%m')
+	return pd.datetime.strptime('199'+str(x), '%Y-%m')
 
 #找到最適合差分的階數 (只找前8階)  階數最小且p -value 小於0.05的
 def best_diff(df, maxdiff = 8):
@@ -48,6 +48,7 @@ def best_p_q(d, series):
     
     #找出bic最小的 p,q參數
     bic_matrix = pd.DataFrame(bic_matrix) 
+    print(bic_matrix )
     p,q = bic_matrix.stack().idxmin() 
     return p,q
     
@@ -86,6 +87,7 @@ print("隨機性檢定結果(Ture 可分析, False 不可分析):",result)
 #前5個的 自相關係數皆大於0.5 因此可能是重要的
 #而該AR模型  或許lag operatror =5是個不錯的起始點
 
+print(series)
 #取得bic最佳的pq參數
 p, q=best_p_q(d, series)
 
